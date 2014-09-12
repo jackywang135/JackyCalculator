@@ -67,6 +67,7 @@
         [self.calculator clearMemory];
         self.strDisplay = newDigit;
         [self updateDisplay:self.strDisplay];
+        [self printValues];
         return;
     }
 
@@ -74,6 +75,18 @@
         if([newDigit isEqualToString:@"0"]) {
             return;
         }
+    }
+    
+    if ([self.strDisplay isEqualToString:@"0"] && [newDigit isEqualToString:@"0"]) {
+        return;
+        
+    }
+    
+    if ([self.strDisplay isEqualToString:@"0"] && ![newDigit isEqualToString:@"0"]) {
+        [self.calculator clearMemory];
+        self.strDisplay=nil;
+        [self updateDisplay:self.strDisplay];
+        [self printValues];
     }
     
     self.strDisplay = self.strDisplay != nil ? [self.strDisplay stringByAppendingString:newDigit] : newDigit;
@@ -109,7 +122,6 @@
     }
 
     self.calculator.operator=sender.currentTitle;
-
     [self printValues];
 }
 
@@ -135,31 +147,50 @@
 
 -(IBAction)buttonInvert:(UIButton*)sender
 {
-    if([self.calculator ifLastOperationWasEqual]==YES)
-    {
-        self.strDisplay=[NSString stringWithFormat:@"%@",self.calculator.num];
-    }
-    NSDecimalNumber *NegOne=[[NSDecimalNumber alloc]initWithString:@"-1"];
-    self.
-    
-    
-    self.strDisplay=[NSString stringWithFormat:@"%f",[self.strDisplay doubleValue]*(-1)];
-    [self updateDisplay:self.strDisplay];
-    [self printValues];
-    
+    [self mutiplyNumber:[[NSDecimalNumber alloc] initWithInteger:-1]];
 }
 
 -(IBAction)buttonPercent:(UIButton*)sender
 {
+    [self mutiplyNumber:[[NSDecimalNumber alloc] initWithDouble:0.01]];
+}
+
+- (void)mutiplyNumber:(NSDecimalNumber *)inNumber
+{
+    NSDecimalNumber *display=[[NSDecimalNumber alloc]initWithString:self.strDisplay];
     
+    
+    
+    if([self.strDisplay isEqualToString:@"0"]){
+        return;
+    }
+    
+    if([self.calculator ifLastOperationWasEqual]==YES || !self.strDisplay){
+        
+        self.calculator.num=[self.calculator.num decimalNumberByMultiplyingBy:inNumber];
+        [self updateDisplay:[NSString stringWithFormat:@"%@",self.calculator.num]];
+        return;
+        
+    }
+    else {
+        self.strDisplay = [NSString stringWithFormat:@"%@",[display decimalNumberByMultiplyingBy:inNumber]];
+        [self updateDisplay:self.strDisplay];
+    }
+    if(!self.strDisplay){
+        self.strDisplay=[NSString stringWithFormat:@"0"];
+        [self updateDisplay:self.strDisplay];
+        [self.calculator clearMemory];
+    }
 }
 
 
 -(void)updateDisplay:(NSString*)string
 {
-    self.labelDisplay.attributedText=[self convertStringToAttributed:string];
-    self.labelDisplay.numberOfLines=1;
-    self.labelDisplay.adjustsFontSizeToFitWidth=YES;
+    if(string){
+        self.labelDisplay.attributedText=[self convertStringToAttributed:string];
+        self.labelDisplay.numberOfLines=1;
+        self.labelDisplay.adjustsFontSizeToFitWidth=YES;
+    }
 }
 
 -(NSAttributedString*)convertStringToAttributed:(NSString*)string

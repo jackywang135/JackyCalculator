@@ -13,6 +13,7 @@
 
 - (NSDecimalNumber*)calculate:(NSDecimalNumber*)a
 {
+    if(a) {
     NSDictionary *operatorStringSelectorMap = @{
        @"+": @"decimalNumberByAdding:",
        @"-": @"decimalNumberBySubtracting:",
@@ -21,6 +22,7 @@
     NSString *selectorString = operatorStringSelectorMap[self.operator];
     if (selectorString) {
         return [self.num performSelector:NSSelectorFromString(selectorString) withObject:a];
+    }
     }
     return nil;
 }
